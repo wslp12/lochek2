@@ -1,0 +1,6 @@
+const enum RECOIL_KEY {
+  MODAL_CONTROLLER = 'MODAL_CONTROLLER',
+  LOGIN_STATUS = 'LOGIN_STATUS',
+}
+
+export default RECOIL_KEY;
