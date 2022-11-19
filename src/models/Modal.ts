@@ -7,5 +7,6 @@ interface IModalProps {
 type IModal<T extends IModalProps = IModalProps> = (props: IModalProps & T) => React.ReactElement;
 
 type ILoginModal = IModal;
+type IAddUserCharacterModal = IModal;
 
-export type { IModal, ILoginModal, IModalProps };
+export type { IModal, ILoginModal, IModalProps, IAddUserCharacterModal };

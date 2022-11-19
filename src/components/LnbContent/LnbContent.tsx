@@ -5,14 +5,28 @@ import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import ROUTE_PATH from '../../enum/route.enum';
 import { useNavigate } from 'react-router-dom';
+import produce from 'immer';
+import { useSetRecoilState } from 'recoil';
+import modalControllerAtomSate from '../../recoil/modal-controller.state';
+import AddUserCharacterModal from '../Modal/AddUserCharacterModal';
 
 const LnbRouteIconButton = () => {
   const navi = useNavigate();
+  const setModalControllerState = useSetRecoilState(modalControllerAtomSate);
+
   const buttonClassName = 'transition-transform duration-700 transform hover:scale-125';
   const iconClassName = 'mt-4 cursor-pointer hover:text-[#FB2576] text-white';
 
   const handleClickButton = (route: ROUTE_PATH) => {
     navi(route);
+  };
+
+  const handleClickAddUserCharacter = () => {
+    setModalControllerState((preveValue) =>
+      produce(preveValue, (draftValue) => {
+        draftValue.push(<AddUserCharacterModal isAutoCloseBackgroundClick />);
+      }),
+    );
   };
 
   return (
@@ -30,7 +44,7 @@ const LnbRouteIconButton = () => {
         <AutoStoriesIcon className={iconClassName} />
       </button>
       <hr className='mt-4 w-full text-white' />
-      <button className={buttonClassName}>
+      <button className={buttonClassName} type='button' onClick={handleClickAddUserCharacter}>
         <AddCircleIcon className={iconClassName} />
       </button>
     </>

@@ -2,7 +2,7 @@ import { CheckBox } from '@mui/icons-material';
 import Switch from '@mui/material/Switch';
 import React from 'react';
 
-const CharSettingContent = () => {
+const CharacterSettingContent = () => {
   const item = [
     {
       id: '검은색폭동',
@@ -45,9 +45,6 @@ const CharSettingContent = () => {
     { name: '라우리엘', check: true },
   ];
   const itemLength = item.length + 1;
-
-  console.log('1');
-  // grid-rows-[${todoLength}]
 
   return (
     <>
@@ -111,12 +108,12 @@ const CharSettingContent = () => {
               style={{ width: '9999px' }}
             >
               <div
-                className={`bg-sky-600 w-full h-1/2 flex items-center rounded-l-lg pl-2 z-10 bg-opacity-10`}
+                className={`bg-${color} w-full h-1/2 flex items-center rounded-l-lg pl-2 z-10 bg-opacity-10`}
               >
                 <span>{todoItem.name}</span>
               </div>
             </div>,
-            item.map((character, index) => {
+            item.map((character) => {
               const raid = todoIndex === todo.length - 1 ? 'rounded-b-lg' : '';
               return (
                 <div key={character.id} className={`${raid}`}>
@@ -134,4 +131,4 @@ const CharSettingContent = () => {
     </>
   );
 };
-export default CharSettingContent;
+export default CharacterSettingContent;

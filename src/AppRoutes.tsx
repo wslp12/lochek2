@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import Auth from './Auth';
-import CharSettingContent from './components/CharSettingContent/CharSettingContent';
+import CharacterSettingContent from './components/CharSettingContent/CharSettingContent';
 import MainLayout from './components/Layout/MainLayout';
 import MainContent from './components/MainContent/MainContent';
 import RaidInfo from './components/RaidInfo/RaidInfo';
@@ -20,8 +20,9 @@ const AppRoutes = () => {
           }
         >
           <Route path={ROUTE_PATH.MAIN} element={<MainContent />} />
-          <Route path={ROUTE_PATH.CHAR_SETTING} element={<CharSettingContent />} />
+          <Route path={ROUTE_PATH.CHAR_SETTING} element={<CharacterSettingContent />} />
           <Route path={ROUTE_PATH.RAID_INFO} element={<RaidInfo />} />
+          <Route path={`${ROUTE_PATH.USERS}/:characterName`} element={<MainContent />} />
           <Route path='*' element={<Navigate to={`/${ROUTE_PATH.MAIN}`} replace />} />
         </Route>
       </Routes>

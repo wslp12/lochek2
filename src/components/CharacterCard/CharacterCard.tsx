@@ -2,15 +2,13 @@ import React from 'react';
 
 const CharacterCard = () => {
   return (
-    <div className='h-full'>
-      <div className='p-2 flex flex-col overflow-auto h-full'>
-        <CharacterImageSet />
-        <CharacterImageSet />
-        <CharacterImageSet />
-        <CharacterImageSet />
-        <CharacterImageSet />
-        <CharacterImageSet />
-      </div>
+    <div className='h-full p-2 flex flex-col overflow-auto'>
+      <CharacterImageSet />
+      <CharacterImageSet />
+      <CharacterImageSet />
+      <CharacterImageSet />
+      <CharacterImageSet />
+      <CharacterImageSet />
     </div>
   );
 };
@@ -36,12 +34,7 @@ const CharacterImage = (props: { src: string }) => {
   const size = 'w-[80px] h-[80px]';
   return (
     <div className={`${size} m-2`}>
-      <img
-        className={`${size} rounded-full cursor-pointer`}
-        src={src}
-        alt='검은색폭동'
-        loading='lazy'
-      />
+      <img className={`${size} rounded-full`} src={src} alt='검은색폭동' loading='lazy' />
     </div>
   );
 };
@@ -50,7 +43,7 @@ const TodoImage = (props: { src: string }) => {
   const { src } = props;
   const size = 'w-[80px] h-[80px]';
   return (
-    <div className={`${size} m-2`}>
+    <div className={`${size} m-2 cursor-pointer`}>
       <img
         src='http://www.lochek.site/done.png'
         className={`${size} absolute z-10 cursor-pointe`}

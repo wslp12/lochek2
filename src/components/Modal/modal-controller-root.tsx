@@ -14,10 +14,11 @@ const modalControllerRoot = (ModalComponent: IModal) =>
 
     //#region events
     const handleOnClickModalBackground = () => {
+      console.log(modalProps.isAutoCloseBackgroundClick);
       if (!modalProps.isAutoCloseBackgroundClick) return;
       setModalControllerState((preveValue) =>
         produce(preveValue, (draftValue) => {
-          draftValue.splice(1, 1);
+          return draftValue.splice(1, 1);
         }),
       );
     };
@@ -26,7 +27,7 @@ const modalControllerRoot = (ModalComponent: IModal) =>
     return (
       <div
         onClick={handleOnClickModalBackground}
-        className='w-full h-full flex fixed top-0 left-0 justify-center items-center bg-opacity-50 bg-slate-200'
+        className='w-full h-full flex fixed top-0 left-0 justify-center items-center bg-opacity-50 bg-slate-200 z-30'
       >
         <ModalComponent isAutoCloseBackgroundClick />
       </div>
