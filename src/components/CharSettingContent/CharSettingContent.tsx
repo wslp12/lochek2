@@ -1,4 +1,3 @@
-import { CheckBox } from '@mui/icons-material';
 import Switch from '@mui/material/Switch';
 import React from 'react';
 
