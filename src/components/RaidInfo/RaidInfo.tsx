@@ -1,9 +1,11 @@
-import React from 'react';
+import priceImage from '../../assets/price.png';
+import avDogImage from '../../assets/avdog.png';
 
 const RaidInfo = () => {
   return (
-    <div className='p-3'>
-      <img src='http://www.lochek.site/av1dog.jpg' alt='' />
+    <div className="p-3">
+      <img src={avDogImage} alt="아브투견" />
+      <img src={priceImage} alt="price" />
     </div>
   );
 };

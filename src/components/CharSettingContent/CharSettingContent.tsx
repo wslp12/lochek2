@@ -1,89 +1,116 @@
 import Switch from '@mui/material/Switch';
+import produce from 'immer';
 import React from 'react';
+import { useRecoilState } from 'recoil';
+import useGetRaid from '../../api/get-raid.api';
+import usePatchCharacterDisplay from '../../api/patch-character-display';
+import usePatchTodoDisplay from '../../api/patch-todo-display';
+import { Character, Todo } from '../../models';
+import loginAtomState from '../../recoil/login.state';
 
 const CharacterSettingContent = () => {
-  const item = [
-    {
-      id: '검은색폭동',
-      imageSrc:
-        'https://img.lostark.co.kr/profile/5/E0DD263DD0A28CC56813AEBB3026DF5E9AE54C2ACEFBD004C319E1ABBCB3D776.PNG',
-    },
-    {
-      id: '초록색폭동',
-      imageSrc:
-        'https://img.lostark.co.kr/profile/5/E0DD263DD0A28CC56813AEBB3026DF5E9AE54C2ACEFBD004C319E1ABBCB3D776.PNG',
-    },
-    {
-      id: '백색폭동',
-      imageSrc:
-        'https://img.lostark.co.kr/profile/5/E0DD263DD0A28CC56813AEBB3026DF5E9AE54C2ACEFBD004C319E1ABBCB3D776.PNG',
-    },
-    {
-      id: '회색폭동',
-      imageSrc:
-        'https://img.lostark.co.kr/profile/5/E0DD263DD0A28CC56813AEBB3026DF5E9AE54C2ACEFBD004C319E1ABBCB3D776.PNG',
-    },
-    {
-      id: '분홍색폭동',
-      imageSrc:
-        'https://img.lostark.co.kr/profile/5/E0DD263DD0A28CC56813AEBB3026DF5E9AE54C2ACEFBD004C319E1ABBCB3D776.PNG',
-    },
-    {
-      id: '윤지만',
-      imageSrc:
-        'https://img.lostark.co.kr/profile/5/E0DD263DD0A28CC56813AEBB3026DF5E9AE54C2ACEFBD004C319E1ABBCB3D776.PNG',
-    },
-  ];
+  const [loginInfo, setLoginInfo] = useRecoilState(loginAtomState);
+  const { mutate } = usePatchCharacterDisplay();
+  const { mutate: todoMutate } = usePatchTodoDisplay();
 
-  const todo = [
-    { name: '에포나', check: true },
-    { name: '가디언', check: true },
-    { name: '아브렐슈드', check: true },
-    { name: '비아키스', check: true },
-    { name: '발탄', check: true },
-    { name: '라우리엘', check: true },
-  ];
-  const itemLength = item.length + 1;
+  const { data: raidList, isLoading, isError } = useGetRaid();
+  if (isLoading) return <div>레이드 리스트를 불러오는 중입니다.</div>;
+  if (isError) return <div>레이드 리스트를 불러오는중 에러가 발생 했습니다.</div>;
+  if ('message' in raidList) return <div>에러발생</div>;
+
+  const { characterList, todoList } = loginInfo;
+
+  // 그리드에서 캐릭터 길이 +1 을 한다.
+  const itemLength = characterList.length + 1;
+
+  const handleClickCharacterShow = (character: Character) => {
+    const changedDisplay = !character.display;
+    mutate(
+      { name: character.name, display: !character.display },
+      {
+        onSuccess: (res) => {
+          setLoginInfo((preveState) =>
+            produce(preveState, (draftState) => {
+              const currentCharacterListIndex = draftState.characterList.findIndex(
+                (characterListItem) => {
+                  return characterListItem.name === character.name;
+                },
+              );
+              draftState.characterList[currentCharacterListIndex].display = changedDisplay;
+            }),
+          );
+        },
+      },
+    );
+  };
+
+  const handleClickTodoShow = (todo: Todo) => {
+    const changedDisplay = !todo.display;
+    todoMutate(
+      {
+        id: +todo.id,
+        formData: {
+          display: !todo.display,
+        },
+      },
+      {
+        onSuccess(data) {
+          setLoginInfo((preveState) =>
+            produce(preveState, (draftState) => {
+              const currentTodoListIndex = draftState.todoList.findIndex((todoListItem) => {
+                return todoListItem.id === todo.id;
+              });
+              draftState.todoList[currentTodoListIndex].display = changedDisplay;
+            }),
+          );
+        },
+      },
+    );
+  };
 
   return (
     <>
       <div
-        className={`grid grid-rows-${todo.length} gap-x-3 overflow-hidden `}
+        className={`grid grid-rows-${raidList.length} gap-x-3 overflow-hidden `}
         style={{
           gridTemplateColumns: `repeat(${itemLength}, minmax(100px, 1fr))`,
         }}
       >
-        <div className='overflow-hidden flex items-center justify-center'>/</div>
-        {item.map((item) => (
-          <div key={item.id} className='w-full h-full box-border'>
-            <div className='bg-black w-full h-full'>
-              <img className='w-full h-full' src={item.imageSrc} alt='' />
+        <div className="overflow-hidden flex items-center justify-center">/</div>
+        {characterList.map((characterListItem) => (
+          <div key={characterListItem.name} className="w-full h-full box-border">
+            <div className="bg-black w-full h-full">
+              <img className="w-full h-full" src={characterListItem.profileSrc} alt="" />
             </div>
           </div>
         ))}
         {[
           <div
-            className='flex justify-start items-center'
-            key='character-index'
+            className="flex justify-start items-center"
+            key="character-index"
             style={{ width: '9999px' }}
           >
-            <div className='bg-sky-600 w-full h-1/2 flex items-center rounded-l-lg pl-2 z-10 bg-opacity-10'>
+            <div className="bg-sky-600 w-full h-1/2 flex items-center rounded-l-lg pl-2 z-10 bg-opacity-10">
               <span>캐릭터</span>
             </div>
           </div>,
-          item.map((item) => (
-            <div key={item.id}>
-              <div className='mt-5 mb-5 w-full h-full flex justify-center '>
-                <span className='z-20'>
-                  <Switch color='error' />
+          characterList.map((characterListItem) => (
+            <div key={characterListItem.name}>
+              <div className="mt-5 mb-5 w-full h-full flex justify-center ">
+                <span className="z-20">
+                  <Switch
+                    color="error"
+                    checked={characterListItem.display}
+                    onClick={() => handleClickCharacterShow(characterListItem)}
+                  />
                 </span>
               </div>
             </div>
           )),
         ]}
-        {todo.map((todoItem, todoIndex) => {
+        {raidList.map((raidListItem, raidListIndex) => {
           let color = 'yellow-300';
-          switch (todoItem.name) {
+          switch (raidListItem.name) {
             case '가디언':
               color = 'green-300';
               break;
@@ -102,23 +129,35 @@ const CharacterSettingContent = () => {
           }
           return [
             <div
-              className='flex justify-start items-center'
-              key={todoItem.name}
+              className="flex justify-start items-center"
+              key={raidListItem.name}
               style={{ width: '9999px' }}
             >
               <div
                 className={`bg-${color} w-full h-1/2 flex items-center rounded-l-lg pl-2 z-10 bg-opacity-10`}
               >
-                <span>{todoItem.name}</span>
+                <span>{raidListItem.name}</span>
               </div>
             </div>,
-            item.map((character) => {
-              const raid = todoIndex === todo.length - 1 ? 'rounded-b-lg' : '';
+            characterList.map((characterListItem) => {
+              const currentTodo = todoList.find((todoListItem) => {
+                return (
+                  todoListItem.raid.name === raidListItem.name &&
+                  characterListItem.name === todoListItem.characterName
+                );
+              });
+              if (currentTodo === undefined) return <div>예외사항 발생</div>;
+              // characterListItem.name ===
+              const raid = raidListIndex === raidList.length - 1 ? 'rounded-b-lg' : '';
               return (
-                <div key={character.id} className={`${raid}`}>
+                <div key={characterListItem.name} className={`${raid}`}>
                   <div className={`mt-5 mb-5 w-full h-full flex justify-center`}>
-                    <span className='z-20'>
-                      <Switch color='error' />
+                    <span className="z-20">
+                      <Switch
+                        color="error"
+                        checked={currentTodo.display}
+                        onClick={() => handleClickTodoShow(currentTodo)}
+                      />
                     </span>
                   </div>
                 </div>

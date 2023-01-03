@@ -1,59 +1,120 @@
-import React from 'react';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import dayjs from 'dayjs';
+import 'dayjs/locale/ko';
+import {
+  DragDropContext,
+  Draggable,
+  DraggingStyle,
+  Droppable,
+  DropResult,
+  NotDraggingStyle,
+  DroppableProps,
+} from 'react-beautiful-dnd';
+import usePatchTodo from '../../api/patch-todo';
+
+import HOST_INFO from '../../enum/host.enum';
+import { Character, Todo, TodoState, UserInfo } from '../../models';
+import loginAtomState from '../../recoil/login.state';
+import { toast } from 'react-toastify';
+import produce, { immerable } from 'immer';
+import { useQueryClient } from '@tanstack/react-query';
+import QUERY_KEY from '../../enum/query.enum';
+import usePatchCharacterList from '../../api/patch-character-list';
+import { useEffect, useState } from 'react';
+import usePatchCharacterParse from '../../api/patch-character-parse';
+import CharacterImageSet from '../CharacterImageSet/CharacterImageSet';
+import UserAccountImageSet from '../UserAccountTodo/UserAccountTodo';
+
+const reorder = (list: Character[], startIndex: number, endIndex: number): Character[] => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+
+  return result;
+};
+
+const StrictModeDroppable = ({ children, ...props }: DroppableProps) => {
+  const [enabled, setEnabled] = useState(false);
+  useEffect(() => {
+    const animation = requestAnimationFrame(() => setEnabled(true));
+    return () => {
+      cancelAnimationFrame(animation);
+      setEnabled(false);
+    };
+  }, []);
+  if (!enabled) {
+    return null;
+  }
+  return <Droppable {...props}>{children}</Droppable>;
+};
 
 const CharacterCard = () => {
-  return (
-    <div className='h-full p-2 flex flex-col overflow-auto'>
-      <CharacterImageSet />
-      <CharacterImageSet />
-      <CharacterImageSet />
-      <CharacterImageSet />
-      <CharacterImageSet />
-      <CharacterImageSet />
-    </div>
-  );
-};
+  const [loginInfo, setLoginInfo] = useRecoilState(loginAtomState);
+  const { characterList, name, todoList } = loginInfo;
 
-const CharacterImageSet = () => {
-  return (
-    <div className='mt-5 p-2 box-border rounded-3xl h-full flex bg-opacity-5 shadow-black shadow-md overflow-y-hidden bg-white items-center'>
-      <CharacterImage src='https://img.lostark.co.kr/profile/5/E0DD263DD0A28CC56813AEBB3026DF5E9AE54C2ACEFBD004C319E1ABBCB3D776.PNG' />
-      <TodoImage src='http://www.lochek.site/gad.png' />
-      <TodoImage src='http://www.lochek.site/chaosd.png' />
-      <TodoImage src='http://www.lochek.site/epona.png' />
-      <TodoImage src='http://www.lochek.site/val1.jpg' />
-      <TodoImage src='http://www.lochek.site/kuku.jpg' />
-      <TodoImage src='http://www.lochek.site/argp-new.png' />
-      <TodoImage src='http://www.lochek.site/av1.jpg' />
-      <TodoImage src='http://www.lochek.site/kayangnew.PNG' />
-    </div>
-  );
-};
+  const charList: Character[] = characterList.filter((item) => item.display);
+  // const charList: Character[] = characterList;
 
-const CharacterImage = (props: { src: string }) => {
-  const { src } = props;
-  const size = 'w-[80px] h-[80px]';
-  return (
-    <div className={`${size} m-2`}>
-      <img className={`${size} rounded-full`} src={src} alt='검은색폭동' loading='lazy' />
-    </div>
-  );
-};
+  const { mutate: mutateCharacterList } = usePatchCharacterList();
 
-const TodoImage = (props: { src: string }) => {
-  const { src } = props;
-  const size = 'w-[80px] h-[80px]';
+  const onDragEnd = (result: DropResult) => {
+    if (!result.destination) {
+      return;
+    }
+
+    const items: Character[] = reorder(
+      characterList,
+      result.source.index,
+      result.destination.index,
+    );
+
+    setLoginInfo((preveState) => {
+      return {
+        ...preveState,
+        characterList: items.map((item, index) => ({ ...item, order: index })),
+      };
+    });
+    mutateCharacterList({
+      name,
+      characterList: items.map((item, index) => ({
+        ...item,
+        order: index,
+      })),
+    });
+  };
+
   return (
-    <div className={`${size} m-2 cursor-pointer`}>
-      <img
-        src='http://www.lochek.site/done.png'
-        className={`${size} absolute z-10 cursor-pointe`}
-      />
-      <img
-        className={`${size} rounded-full cursor-pointer opacity-50`}
-        src={src}
-        alt='검은색폭동'
-        loading='lazy'
-      />
+    <div className="p-2 flex flex-col overflow-auto">
+      <UserAccountImageSet />
+      <DragDropContext onDragEnd={onDragEnd}>
+        <StrictModeDroppable droppableId="droppable">
+          {(provided): JSX.Element => (
+            <div className="" {...provided.droppableProps} ref={provided.innerRef}>
+              {charList.map((charListItem, index) => {
+                return (
+                  <Draggable key={charListItem.name} draggableId={charListItem.name} index={index}>
+                    {(provided): JSX.Element => (
+                      <div
+                        key={charListItem.name}
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                      >
+                        <CharacterImageSet
+                          key={charListItem.name}
+                          characterInfo={charListItem}
+                          readOnly={false}
+                        />
+                      </div>
+                    )}
+                  </Draggable>
+                );
+              })}
+              {provided.placeholder}
+            </div>
+          )}
+        </StrictModeDroppable>
+      </DragDropContext>
     </div>
   );
 };

@@ -1,33 +1,25 @@
-import React, { useEffect } from 'react';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { produce } from 'immer';
-import LoginModal from './components/Modal/LoginModal';
-import modalControllerAtomSate from './recoil/modal-controller.state';
-import isLoginAtomState from './recoil/login-status.state';
+import { memo, useEffect } from 'react';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
+import { ROUTE_PATH } from './enum/route.enum';
+import loginAtomState from './recoil/login.state';
 
-function Auth(props: { children: React.ReactNode }) {
+const Auth = (props: { children: React.ReactNode }) => {
   const { children } = props;
 
-  const setModalControllerState = useSetRecoilState(modalControllerAtomSate);
-  const isLoginState = useRecoilValue(isLoginAtomState);
+  const navi = useNavigate();
+  const loginState = useRecoilValue(loginAtomState);
 
-  //#region useEffects
   useEffect(() => {
-    // if (isLoginState === false) {
-    //   setModalControllerState((preveValue) =>
-    //     produce(preveValue, (draftValue) => {
-    //       draftValue.push(<LoginModal isAutoCloseBackgroundClick />);
-    //     }),
-    //   );
-    // }
+    if (loginState === null) {
+      globalThis.localStorage.clear();
+      navi(ROUTE_PATH.LOGIN);
+    }
+  }, [loginState]);
 
-    return () => {
-      setModalControllerState((preveValue) => produce(preveValue, () => []));
-    };
-  }, []);
-  //#endregion
+  if (loginState === null) return <Navigate to={ROUTE_PATH.LOGIN} />;
 
   return <>{children}</>;
-}
+};
 
-export default Auth;
+export default memo(Auth);
