@@ -1,13 +1,14 @@
-import React from 'react';
+import { Reservation } from '../recoil/reservation.state';
 
-interface IModalProps {
+interface IModalDefaultProps {
   isAutoCloseBackgroundClick?: boolean;
   closeModal?: () => void;
 }
 
-type IModal<T extends IModalProps = IModalProps> = (props: IModalProps & T) => React.ReactElement;
+type IModalProps<T = unknown> = IModalDefaultProps & T;
 
-type ILoginModal = IModal;
-type IAddUserCharacterModal = IModal;
+type ReservationModalProps = IModalProps<Reservation>;
+type AddUserModalProps = IModalProps;
 
-export type { IModal, ILoginModal, IModalProps, IAddUserCharacterModal };
+
+export type { IModalProps, ReservationModalProps, AddUserModalProps };

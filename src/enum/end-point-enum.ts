@@ -13,6 +13,7 @@ const enum END_POINT {
   ORGANIZATION = '/oranization',
   GORUP_SET_NAME = '/group-set-name',
   ACCOUNT_RAID = '/week-account-raid',
+  RESERVATION = '/reservation',
 }
 
 export default END_POINT;

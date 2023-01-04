@@ -86,7 +86,6 @@ const TodoList = ({ character, readOnly }: { character: Character; readOnly: boo
             return toast.error(res.message);
           }
 
-          console.log(userId);
           queryClient.setQueryData<Todo[]>([QUERY_KEY.TODO_LIST, currentUserId], (preveState) =>
             produce(preveState, (draftState) => {
               if (!draftState) return preveState;
@@ -94,7 +93,6 @@ const TodoList = ({ character, readOnly }: { character: Character; readOnly: boo
               const findIndex = draftState.findIndex((item) => {
                 return item.id === id;
               });
-              console.log(findIndex);
 
               draftState[findIndex].done = !todoDone;
             }),

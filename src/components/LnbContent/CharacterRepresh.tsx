@@ -35,14 +35,13 @@ const CharacterRepresh = (props: { buttonClassName: string; iconClassName: strin
    * 1: 하루 지남
    */
   const diffDay = dayjs().diff(refreshTime, 'day');
-  console.log(dayjs().diff(refreshTime, 'day'));
 
   return (
     <button
       className={buttonClassName}
       type="button"
       onClick={handleClickChracterParse}
-      // disabled={isLoading || (diffDay !== 1 && !isNaN(diffDay))}
+      disabled={isLoading || (diffDay !== 1 && !isNaN(diffDay))}
     >
       <RefreshIcon className={iconClassName} />
     </button>

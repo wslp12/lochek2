@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import usePostOrganization from '../../api/post-organization.api';
-import { AddUserModalProps, IModalProps } from '../../models/Modal';
-
+import { IModalProps } from '../../models/Modal';
 import loginAtomState from '../../recoil/login.state';
-import modalController from './modal-controller-root';
+import { Reservation } from '../../recoil/reservation.state';
+import modalControllerRoot from './modal-controller-root';
 
-/**
- * 로그인 모달입니다.
- */
-const AddUserCharacterModal = (props: AddUserModalProps) => {
-  const { closeModal } = props;
+const SelectCharacterModal = (props: IModalProps<Reservation>) => {
+  const { closeModal, jewelLimit, raid, levelLimit, startTime } = props;
+  console.log(jewelLimit, raid, levelLimit, startTime);
+  
   const { mutate } = usePostOrganization();
   const [characterNameInput, setCharacterNameInput] = useState('');
   const loginInfo = useRecoilValue(loginAtomState);
@@ -72,4 +71,4 @@ const AddUserCharacterModal = (props: AddUserModalProps) => {
   );
 };
 
-export default modalController(AddUserCharacterModal);
+export default modalControllerRoot(SelectCharacterModal);

@@ -17,6 +17,8 @@ import {
   reservationDateAtomState,
   reservationRaidTypeAtomState,
 } from '../../recoil/reservation.state';
+import usePostReservation from '../../api/post-reservation.api';
+import ReservationList from './ReservationList';
 
 /**
  * 레이드 셀렉트
@@ -63,7 +65,6 @@ const RaidSelect = () => {
     const selectRaid = raidSelectInfoList.find(
       (raidSelectInfoListItem) => raidSelectInfoListItem.name === newInput,
     );
-    console.log(selectRaid);
     if (!selectRaid) return;
 
     setReservation((preveState) =>
@@ -230,13 +231,30 @@ const CharacterSelect = () => {
 
 const ReservationSaveButton = () => {
   const [reservation, setReservation] = useRecoilState(reservationAtomState);
+  const { accountLevelLimit, jewelLimit, levelLimit, numberOfPeople, raid } = reservation;
   const reservationDate = useRecoilValue(reservationDateAtomState);
-  console.log(reservation);
-  console.log(reservationDate);
+  const reservationRaidType = useRecoilValue(reservationRaidTypeAtomState);
+  const loginInfo = useRecoilValue(loginAtomState);
+
+  const { mutate } = usePostReservation();
+
+
+  const handleClickReservationPostButton = () => {
+    mutate({
+      accountLevelLimit,
+      jewelLimit,
+      levelLimit,
+      numberOfPeople,
+      raid,
+      raidType: reservationRaidType,
+      startTime: reservationDate,
+      register: loginInfo,
+    })
+  }
 
   return (
     <div className="flex last:mt-auto">
-      <Button variant="contained" className="w-full">
+      <Button variant="contained" className="w-full" onClick={handleClickReservationPostButton}>
         제출
       </Button>
     </div>
@@ -290,6 +308,7 @@ const Schedule = () => {
         <ReservationDateInput />
         <ReservationSaveButton />
       </div>
+      <ReservationList />
     </div>
   );
 };

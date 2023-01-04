@@ -149,7 +149,6 @@ const UserAccountTodoList = (props: { loginInfo: UserInfo; readOnly: boolean }) 
                 const findIndex = draftState.findIndex((item) => {
                   return item.id === id;
                 });
-                console.log(findIndex);
 
                 draftState[findIndex].done = !todoDone;
               }),

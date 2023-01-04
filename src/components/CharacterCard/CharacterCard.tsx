@@ -1,27 +1,15 @@
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import dayjs from 'dayjs';
-import 'dayjs/locale/ko';
+import { useRecoilState } from 'recoil';
 import {
   DragDropContext,
   Draggable,
-  DraggingStyle,
   Droppable,
   DropResult,
-  NotDraggingStyle,
   DroppableProps,
 } from 'react-beautiful-dnd';
-import usePatchTodo from '../../api/patch-todo';
-
-import HOST_INFO from '../../enum/host.enum';
-import { Character, Todo, TodoState, UserInfo } from '../../models';
+import { Character } from '../../models';
 import loginAtomState from '../../recoil/login.state';
-import { toast } from 'react-toastify';
-import produce, { immerable } from 'immer';
-import { useQueryClient } from '@tanstack/react-query';
-import QUERY_KEY from '../../enum/query.enum';
 import usePatchCharacterList from '../../api/patch-character-list';
 import { useEffect, useState } from 'react';
-import usePatchCharacterParse from '../../api/patch-character-parse';
 import CharacterImageSet from '../CharacterImageSet/CharacterImageSet';
 import UserAccountImageSet from '../UserAccountTodo/UserAccountTodo';
 
