@@ -3,7 +3,10 @@ import { atom } from "recoil";
 import RECOIL_KEY from "../enum/recoil.enum";
 import { Raid, Character, UserInfo } from "../models";
 
-export type  RaidType = "학원" | "트라이" | "헤딩" | "반숙" | "숙련" | "클경";
+export type RaidType = "학원" | "트라이" | "헤딩" | "반숙" | "숙련" | "클경";
+export type SimpleUserModel = Pick<UserInfo, "name" | "profileSrc" | "token">;
+export type CharacterWithUser = Character & { user: SimpleUserModel };
+export type reservateCharacter = { id: number, character: CharacterWithUser };
 export type Reservation = {
   id: number,
   raid: Raid,
@@ -11,15 +14,15 @@ export type Reservation = {
   levelLimit: number,
   jewelLimit: number,
   numberOfPeople: number,
-  character: Character[],
+  reservateCharacter: reservateCharacter[],
   startTime: string;
   raidType: RaidType;
   register: UserInfo,
 }
 
-export type ReservationPostParam = Omit<Reservation, "character" | "id">;
+export type ReservationPostParam = Omit<Reservation, "reservateCharacter" | "id">;
 
-export type ReservationAtomState = Omit<ReservationPostParam, "startTime" | "raidType" >
+export type ReservationAtomState = Omit<ReservationPostParam, "startTime" | "raidType">
 
 const reservationAtomState = atom<ReservationAtomState>({
   key: RECOIL_KEY.RESERVATION,

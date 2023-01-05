@@ -1,5 +1,4 @@
-import dayjs from "dayjs";
-import 'dayjs/locale/ko';
+
 import { atom } from "recoil";
 import RECOIL_KEY from "../enum/recoil.enum";
 import localStorageEffect from "./local-storage.effect";

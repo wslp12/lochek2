@@ -14,6 +14,7 @@ const enum END_POINT {
   GORUP_SET_NAME = '/group-set-name',
   ACCOUNT_RAID = '/week-account-raid',
   RESERVATION = '/reservation',
+  RESERVATION_CHARACTER = '/reservate-character',
 }
 
 export default END_POINT;

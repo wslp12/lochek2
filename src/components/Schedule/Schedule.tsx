@@ -19,6 +19,9 @@ import {
 } from '../../recoil/reservation.state';
 import usePostReservation from '../../api/post-reservation.api';
 import ReservationList from './ReservationList';
+import { useQueryClient } from '@tanstack/react-query';
+import QUERY_KEY from '../../enum/query.enum';
+import { toast } from 'react-toastify';
 
 /**
  * 레이드 셀렉트
@@ -231,6 +234,7 @@ const CharacterSelect = () => {
 
 const ReservationSaveButton = () => {
   const [reservation, setReservation] = useRecoilState(reservationAtomState);
+  const queryClient = useQueryClient();
   const { accountLevelLimit, jewelLimit, levelLimit, numberOfPeople, raid } = reservation;
   const reservationDate = useRecoilValue(reservationDateAtomState);
   const reservationRaidType = useRecoilValue(reservationRaidTypeAtomState);
@@ -238,19 +242,31 @@ const ReservationSaveButton = () => {
 
   const { mutate } = usePostReservation();
 
-
   const handleClickReservationPostButton = () => {
-    mutate({
-      accountLevelLimit,
-      jewelLimit,
-      levelLimit,
-      numberOfPeople,
-      raid,
-      raidType: reservationRaidType,
-      startTime: reservationDate,
-      register: loginInfo,
-    })
-  }
+    console.log(raid);
+    if (!raid.groupName) {
+      toast.error('레이드를 선택 해주세요');
+      return;
+    }
+
+    mutate(
+      {
+        accountLevelLimit,
+        jewelLimit,
+        levelLimit,
+        numberOfPeople,
+        raid,
+        raidType: reservationRaidType,
+        startTime: reservationDate,
+        register: loginInfo,
+      },
+      {
+        onSuccess(data, variables, context) {
+          queryClient.invalidateQueries([QUERY_KEY.RESERVATION_LIST]);
+        },
+      },
+    );
+  };
 
   return (
     <div className="flex last:mt-auto">
@@ -297,7 +313,8 @@ const ReservationRaidType = () => {
 
 const Schedule = () => {
   return (
-    <div className="p-6 h-full">
+    <div className="p-6 h-full flex flex-col gap-5">
+      <ReservationList />
       <div className="bg-white flex flex-col p-6 gap-9 rounded-xl h-full">
         <RaidSelect />
         <ReservationRaidType />
@@ -308,7 +325,6 @@ const Schedule = () => {
         <ReservationDateInput />
         <ReservationSaveButton />
       </div>
-      <ReservationList />
     </div>
   );
 };

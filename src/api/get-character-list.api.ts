@@ -3,6 +3,7 @@ import END_POINT from "../enum/end-point-enum";
 import HOST_INFO from "../enum/host.enum";
 import QUERY_KEY from "../enum/query.enum";
 import { Character } from "../models";
+import { CharacterWithUser } from "../recoil/reservation.state";
 import wrapAxios from "./wrap-axios";
 
 const getCharacterListByUserName = (name: string) => {
@@ -15,7 +16,7 @@ const getCharacterListByUserName = (name: string) => {
       'Content-Type': 'application/json',
     },
   };
-  return wrapAxios<Character[]>(config);
+  return wrapAxios<CharacterWithUser[]>(config);
 
 }
 
