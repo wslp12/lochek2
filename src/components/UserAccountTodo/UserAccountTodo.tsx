@@ -42,7 +42,6 @@ const UserAccountTodo = (props: { loginInfo: UserInfo }) => {
         className={`rounded-full m-2 w-24 h-24 min-w-c/image min-h-c/image`}
         src={`${HOST_INFO.HOST}/${profileSrc}`}
         alt={name}
-        loading="lazy"
         onMouseEnter={(e) => handlePopoverOpen(e)}
         onMouseLeave={handlePopoverClose}
       />
@@ -95,7 +94,6 @@ const UserAccountTodoImage = (props: {
           className={`rounded-full cursor-pointer w-full h-full`}
           src={`${HOST_INFO.HOST}/${srcName}`}
           alt={name}
-          loading="lazy"
           style={{
             opacity: `${todoDone ? '0.35' : '1'}`,
           }}

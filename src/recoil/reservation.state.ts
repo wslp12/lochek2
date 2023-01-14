@@ -18,6 +18,7 @@ export type Reservation = {
   startTime: string;
   raidType: RaidType;
   register: UserInfo,
+  done: boolean;
 }
 
 export type ReservationPostParam = Omit<Reservation, "reservateCharacter" | "id">;
@@ -33,6 +34,7 @@ const reservationAtomState = atom<ReservationAtomState>({
     jewelLimit: 0,
     numberOfPeople: 0,
     register: {} as any,
+    done: false,
   },
 })
 

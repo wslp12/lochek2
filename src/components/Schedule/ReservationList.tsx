@@ -9,11 +9,16 @@ import useGetReservation from '../../api/get-reservation.api';
 import HOST_INFO from '../../enum/host.enum';
 import { Character, Raid } from '../../models';
 import modalControllerAtomSate from '../../recoil/modal-controller.state';
-import { Reservation } from '../../recoil/reservation.state';
+import { CharacterWithUser, Reservation } from '../../recoil/reservation.state';
 import SelectCharacterModal from '../Modal/SelectCharacterModal';
 import useDeleteReservation from '../../api/delete-reservation.api';
 import { useQueryClient } from '@tanstack/react-query';
 import QUERY_KEY from '../../enum/query.enum';
+import Popover from '@mui/material/Popover';
+import Typography from '@mui/material/Typography';
+import { useRef, useState } from 'react';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import usePatchReservationDone from '../../api/patch-reservation-done.api';
 
 dayjs.extend(isToday);
 
@@ -21,8 +26,25 @@ const ReservationList = () => {
   const { data: reservationList, isError, isLoading } = useGetReservation();
   const setModalControllerState = useSetRecoilState(modalControllerAtomSate);
   const { mutate: deleteReservationMutate } = useDeleteReservation();
-
+  const { mutate: patchReservationDone } = usePatchReservationDone();
   const queryClient = useQueryClient();
+
+  const info = useRef<Character>();
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
+  const open = Boolean(anchorEl);
+
+  const handlePopoverOpen = (
+    event: React.MouseEvent<HTMLElement>,
+    characerWithUser: CharacterWithUser,
+  ) => {
+    setAnchorEl(event.currentTarget);
+    info.current = characerWithUser;
+  };
+  const handlePopoverClose = () => {
+    setAnchorEl(null);
+  };
+
   if (isLoading) return <div>데이터 불러 오는 중</div>;
   if (isError) return <div>에러 발생</div>;
   if ('message' in reservationList) return <div>알려진 사항 발생</div>;
@@ -39,6 +61,7 @@ const ReservationList = () => {
       register,
       numberOfPeople,
       raidType,
+      done,
     } = reservation;
     setModalControllerState((preveValue) =>
       produce(preveValue, (draftValue) => {
@@ -54,6 +77,7 @@ const ReservationList = () => {
             register={register}
             numberOfPeople={numberOfPeople}
             raidType={raidType}
+            done={done}
           />,
         );
       }),
@@ -61,7 +85,7 @@ const ReservationList = () => {
   };
 
   const getTimeString = (time: string) => {
-    return dayjs(time).isToday() ? dayjs(time).format('HH:MM') : dayjs(time).format('MM-DD/HH:mm');
+    return dayjs(time).isToday() ? dayjs(time).format('HH:mm') : dayjs(time).format('MM-DD/HH:mm');
   };
 
   const handleClickDeleteButton = (id: number) => {
@@ -75,6 +99,20 @@ const ReservationList = () => {
         },
       });
     }
+  };
+
+  const handleClickDoneButton = (id: number, done: boolean) => {
+    patchReservationDone(
+      {
+        id,
+        done: !done,
+      },
+      {
+        onSuccess(data, variables, context) {
+          queryClient.invalidateQueries([QUERY_KEY.RESERVATION_LIST]);
+        },
+      },
+    );
   };
 
   return (
@@ -91,20 +129,31 @@ const ReservationList = () => {
           startTime,
           register,
           levelLimit,
+          done,
         } = reservationItem;
 
         const defaultCharacterArr = reservateCharacter ?? [];
 
         const emptySlotLength = numberOfPeople - defaultCharacterArr.length;
         return (
-          <div key={id} className="gap-3 flex flex-col bg-white bg-opacity-10 rounded-lg p-2">
+          <div
+            key={id}
+            className={`gap-3 flex flex-col bg-white bg-opacity-10 rounded-lg p-2 ${
+              done && 'opacity-20'
+            }`}
+          >
             <div className="flex gap-1 relative">
-              <button
-                className="absolute top-0 right-0"
-                onClick={() => handleClickDeleteButton(id)}
-              >
+              <button className="absolute top-0 right-0 flex flex-col">
                 <DeleteIcon
+                  onClick={() => handleClickDeleteButton(id)}
                   className="text-red-600"
+                  style={{
+                    fontSize: '2rem',
+                  }}
+                />
+                <CheckCircleIcon
+                  onClick={() => handleClickDoneButton(id, done)}
+                  className="text-green-600"
                   style={{
                     fontSize: '2rem',
                   }}
@@ -114,7 +163,6 @@ const ReservationList = () => {
                 className={`rounded-full cursor-pointer w-20 h-20`}
                 src={`${HOST_INFO.HOST}/${raid.srcName}`}
                 alt={raid.name}
-                loading="lazy"
               />
               {reservateCharacter.map((reservateCharacterItem) => {
                 const { character } = reservateCharacterItem;
@@ -123,6 +171,8 @@ const ReservationList = () => {
                   <div
                     key={name}
                     className="rounded-full w-20 h-20 flex justify-center items-center cursor-pointer"
+                    onMouseEnter={(e) => handlePopoverOpen(e, character)}
+                    onMouseLeave={handlePopoverClose}
                   >
                     <img src={profileSrc} className="w-full h-full rounded-full" />
                   </div>
@@ -173,6 +223,31 @@ const ReservationList = () => {
           </div>
         );
       })}
+      <Popover
+        id="mouse-over-popover"
+        sx={{
+          pointerEvents: 'none',
+        }}
+        open={open}
+        anchorEl={anchorEl}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'left',
+        }}
+        onClose={handlePopoverClose}
+        disableRestoreFocus
+      >
+        <Typography sx={{ p: 1 }} variant="body2" component="div">
+          <div>{(info?.current as any)?.name}</div>
+          <div>{(info?.current as any)?.itemLevel}</div>
+          <div>{(info?.current as any)?.level}</div>
+          <div>{(info?.current as any)?.job}</div>
+        </Typography>
+      </Popover>
     </div>
   );
 };

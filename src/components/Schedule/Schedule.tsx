@@ -47,21 +47,27 @@ const RaidSelect = () => {
   if ('message' in charRaidData || 'message' in accountRaidData)
     return <div>api 에러발생(예외x)</div>;
 
-  const raidSelectInfoList = accountRaidData
-    .map((item) => {
-      return {
-        label: item.name,
-        ...item,
-      };
-    })
-    .concat(
-      charRaidData.map((charRaidDataItem) => {
-        return {
-          label: charRaidDataItem.name,
-          ...charRaidDataItem,
-        };
-      }),
-    );
+  // const raidSelectInfoList = accountRaidData
+  //   .map((item) => {
+  //     return {
+  //       label: item.name,
+  //       ...item,
+  //     };
+  //   })
+  //   .concat(
+  //     charRaidData.map((charRaidDataItem) => {
+  //       return {
+  //         label: charRaidDataItem.name,
+  //         ...charRaidDataItem,
+  //       };
+  //     }),
+  //   );
+  const raidSelectInfoList = charRaidData.map((charRaidDataItem) => {
+    return {
+      label: charRaidDataItem.name,
+      ...charRaidDataItem,
+    };
+  });
 
   const handleSelectRaid = (newInput: string) => {
     if (newInput === '') return;
@@ -235,7 +241,7 @@ const CharacterSelect = () => {
 const ReservationSaveButton = () => {
   const [reservation, setReservation] = useRecoilState(reservationAtomState);
   const queryClient = useQueryClient();
-  const { accountLevelLimit, jewelLimit, levelLimit, numberOfPeople, raid } = reservation;
+  const { accountLevelLimit, jewelLimit, levelLimit, numberOfPeople, raid, done } = reservation;
   const reservationDate = useRecoilValue(reservationDateAtomState);
   const reservationRaidType = useRecoilValue(reservationRaidTypeAtomState);
   const loginInfo = useRecoilValue(loginAtomState);
@@ -259,6 +265,7 @@ const ReservationSaveButton = () => {
         raidType: reservationRaidType,
         startTime: reservationDate,
         register: loginInfo,
+        done,
       },
       {
         onSuccess(data, variables, context) {

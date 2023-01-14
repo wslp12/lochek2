@@ -33,7 +33,6 @@ const CharacterImage = (props: { characterInfo: Character }) => {
         className={`rounded-full m-2 w-24 h-24 min-w-c/image min-h-c/image`}
         src={profileSrc}
         alt={name}
-        loading="lazy"
         onMouseEnter={(e) => handlePopoverOpen(e)}
         onMouseLeave={handlePopoverClose}
       />

@@ -33,7 +33,6 @@ const TodoImage = (props: { todo: Todo; onClickTodo: () => void }) => {
           className={`rounded-full cursor-pointer w-full h-full`}
           src={`${HOST_INFO.HOST}/${srcName}`}
           alt={name}
-          loading="lazy"
           style={{
             opacity: `${todoDone ? '0.35' : '1'}`,
           }}
