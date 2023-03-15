@@ -278,7 +278,7 @@ const ReservationSaveButton = () => {
   return (
     <div className="flex last:mt-auto">
       <Button variant="contained" className="w-full" onClick={handleClickReservationPostButton}>
-        제출
+        제출!
       </Button>
     </div>
   );
